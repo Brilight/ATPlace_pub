@@ -39,7 +39,7 @@ We are committed to open-sourcing more components of ATPlace in the future. Spec
 ## How to Use This Repository 🛠️
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/ATPlace2.5D.git
+   git clone https://github.com/Brilight/ATPlace_pub.git
 2. Explore the test cases in the cases directory.
 3. Set up HotSpot-7.0 and use the provided thermal configuration files for thermal modeling.
 4. Results can be compared with the published data in our paper.

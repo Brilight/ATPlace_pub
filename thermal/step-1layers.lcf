@@ -14,7 +14,7 @@ N
 1.06E+06
 3.33
 0.0002
-/home/qpwang/Chiplet_place/ATPlace2.5D/thermal/step-1L0_Substrate.flp
+./thermal/step-1L0_Substrate.flp
 
 # Layer 1: Epoxy SiO2 underfill with C4 copper pillar
 1
@@ -23,7 +23,7 @@ N
 2.32E+06
 0.625
 0.00007
-/home/qpwang/Chiplet_place/ATPlace2.5D/thermal/step-1L1_C4Layer.flp
+./thermal/step-1L1_C4Layer.flp
 
 # Layer 2: silicon interposer
 2
@@ -32,7 +32,7 @@ N
 1.75E+06
 0.01
 0.00011
-/home/qpwang/Chiplet_place/ATPlace2.5D/thermal/step-1L2_Interposer.flp
+./thermal/step-1L2_Interposer.flp
 
 # Layer 3: Underfill with ubump
 3
@@ -41,7 +41,7 @@ N
 2.32E+06
 0.625
 1.00E-05
-/home/qpwang/Chiplet_place/ATPlace2.5D/thermal/step-1L3_UbumpLayer.flp
+./thermal/step-1L3_UbumpLayer.flp
 
 # Layer 4: Chip layer
 4
@@ -50,7 +50,7 @@ Y
 1.75E+06
 0.01
 0.00015
-/home/qpwang/Chiplet_place/ATPlace2.5D/thermal/step-1L4_ChipLayer.flp
+./thermal/step-1L4_ChipLayer.flp
 
 # Layer 5: TIM
 5
@@ -59,4 +59,4 @@ N
 4.00E+06
 0.25
 2.00E-05
-/home/qpwang/Chiplet_place/ATPlace2.5D/thermal/step-1L5_TIM.flp
+./thermal/step-1L5_TIM.flp
