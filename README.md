@@ -19,7 +19,7 @@ The test cases are organized into **10 folders** (`Case1` to `Case10`), each con
 - **Pin Locations**: `*.pl` files that specify the pin locations.
 - **Chiplet Power**: `*.power` files that define the power consumption of chiplets.
 
-These files are formatted based on the **Bookshelf format**, a widely-used standard in placement research. If you need a parser for the Bookshelf format, you can refer to other repositories or tools available online.
+These files are formatted based on the **Bookshelf format**, a widely-used standard in placement research. The parsers can be fount in `utils'.
 
 ---
 
