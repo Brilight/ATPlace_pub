@@ -1,0 +1,7 @@
+# Floorplan for Silicon Interposer Layer
+# Line Format: <unit-name>\t<width>\t<height>\t<left-x>\t<bottom-y>\t[<specific-heat>]\t[<resistivity>]
+# all dimensions are in meters
+# comment lines begin with a '#' 
+# comments and empty lines are ignored
+
+Interposer	0.039	0.039	0.0	0.0	1819776.0	0.00892857142857143

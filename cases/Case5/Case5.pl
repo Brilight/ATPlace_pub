@@ -1,0 +1,11 @@
+CPU1_0 	0	0
+CPU1_1 	0	0
+GPU_0 	0	0
+GPU_1 	0	0
+GPU_2 	0	0
+GPU_3 	0	0
+HBM_0 	0	0
+HBM_1 	0	0
+HBM_2 	0	0
+HBM_3 	0	0
+HBM_4 	0	0

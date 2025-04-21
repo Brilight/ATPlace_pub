@@ -1,0 +1,12 @@
+NumSoftRectangularBlocks : 0
+NumHardRectilinearBlocks : 8
+NumTerminals : 0
+
+CPU2_0 hardrectilinear 4 (0, 0) (0, 9000) (8000, 9000) (8000, 0)
+CPU2_1 hardrectilinear 4 (0, 0) (0, 9000) (8000, 9000) (8000, 0)
+CPU2_2 hardrectilinear 4 (0, 0) (0, 9000) (8000, 9000) (8000, 0)
+CPU2_3 hardrectilinear 4 (0, 0) (0, 9000) (8000, 9000) (8000, 0)
+DRAM_0 hardrectilinear 4 (0, 0) (0, 9000) (9000, 9000) (9000, 0)
+DRAM_1 hardrectilinear 4 (0, 0) (0, 9000) (9000, 9000) (9000, 0)
+DRAM_2 hardrectilinear 4 (0, 0) (0, 9000) (9000, 9000) (9000, 0)
+DRAM_3 hardrectilinear 4 (0, 0) (0, 9000) (9000, 9000) (9000, 0)

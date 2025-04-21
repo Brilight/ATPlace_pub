@@ -1,0 +1,7 @@
+# Floorplan for Substrate Layer with size 0.039x0.039 m
+# Line Format: <unit-name>\t<width>\t<height>\t<left-x>\t<bottom-y>\t[<specific-heat>]\t[<resistivity>]
+# all dimensions are in meters
+# comment lines begin with a '#' 
+# comments and empty lines are ignored
+
+Substrate	0.039	0.039	0.0	0.0

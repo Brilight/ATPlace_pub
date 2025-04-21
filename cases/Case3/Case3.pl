@@ -1,0 +1,8 @@
+CPU2_0 	0	0
+CPU2_1 	0	0
+CPU2_2 	0	0
+CPU2_3 	0	0
+DRAM_0 	0	0
+DRAM_1 	0	0
+DRAM_2 	0	0
+DRAM_3 	0	0
