@@ -1,0 +1,154 @@
+{
+"aux_input" : {
+    "description" : "input .aux file", 
+    "default" : "", 
+    "required" : "required for Bookshelf"
+    }, 
+"lef_input" : {
+    "description" : "input LEF file", 
+    "default" : "", 
+    "required" : "required for LEF/DEF"
+    },
+"def_input" : {
+    "description" : "input DEF file", 
+    "default" : "", 
+    "required" : "required for LEF/DEF"
+    },
+"result_dir" : {
+    "description" : "result directory for output", 
+    "default" : "results"
+    },
+"ILPsolver" : {
+    "description" : "ILP solver used, supporting pulp and grb/gurobi now",
+    "default" : "grb"
+    },
+"warp_aware_opt" : {
+    "description" : "whether to optimize the warpage",
+    "default" : 0
+    },
+"temp_aware_opt" : {
+    "description" : "whether to optimize the temperature",
+    "default" : 1
+    },
+"flip_opt" : {
+    "description" : "",
+    "default" : 0
+    },
+"thermal_solver" : {
+    "description" : "thermal solver used, supporting HotSpot and ATSim now",
+    "default" : "ATSim"
+    },
+"thermal_dir" : {
+    "description" : "path to the directory of the thermal solver", 
+    "default" : "../thermal/"
+    },
+"gpu" : {
+    "description" : "enable gpu or not", 
+    "default" : 0
+    },
+"reso_interposer" : {
+    "description" : "resolution of interposer, the minimum manufacture size, typically <1mm, unit: um", 
+    "default" : 100
+    },
+"dis_bet_chips" : {
+    "description" : "distance between chiplets, typically <0.2mm, unit: um", 
+    "default" : 100
+    },
+"num_bins_x" : {
+    "description" : "number of bins in horizontal direction; computed by internal heuristic if not specified", 
+    "default" : 256
+    },
+"num_bins_y" : {
+    "description" : "number of bins in vertical direction; computed by internal heuristic if not specified", 
+    "default" : 256
+    },
+"num_grid_x" : {
+    "description" : "number of grids in horizontal direction of thermal simulation", 
+    "default" : 64
+    },
+"num_grid_y" : {
+    "description" : "number of grids in vertical direction of thermal simulation", 
+    "default" : 64
+    },
+"floorplan_stages" : {
+    "description" : "floorplan configurations of each stage, a dictionary of {\"num_bins_x\", \"num_bins_y\", \"iteration\", \"learning_rate\", \"learning_rate_decay\", \"wirelength\", \"optimizer\", \"Llambda_density_weight_iteration\", \"Lsub_iteration\"}", 
+    "default" : [{"iteration" : 100, "learning_rate" : 3e-1, "learning_rate_decay" : 0.996, "wirelength" : "weighted_average", "optimizer" : "cgm", "Llambda_density_weight_iteration" : 2, "Lsub_iteration" : 5}], 
+    "required" : "required"
+    },
+"ambient" : {
+    "description" : "ambient temperature of chiplet (on PCB)", 
+    "default" : 45
+    },
+"target_density" : {
+    "description" : "target density", 
+    "default" : 0.5
+    },
+"temp_threshold" : {
+    "description" : "maximum temperature threshold", 
+    "default" : 95
+    },
+"warp_threshold" : {
+    "description" : "warpage threshold", 
+    "default" : 60
+    },
+"density_weight" : {
+    "description" : "initial weight of density cost", 
+    "default" : 3e0
+    },
+"random_seed" : {
+    "description" : "random seed", 
+    "default" : 1000
+    },
+"pertub_flag" : {
+    "description" : "add perturbation or not", 
+    "default" : 1
+    },
+"ignore_net_degree" : {
+    "description" : "ignore net degree larger than some value", 
+    "default" : 100
+    },
+"gp_noise_ratio" : {
+    "description" : "noise to initial positions for global placement", 
+    "default" : 0.1
+    },
+"stop_overflow" : {
+    "description" : "stopping criteria, consider stop when the overflow reaches to a ratio", 
+    "default" : 0.1
+    },
+"dtype" : {
+    "description" : "data type, float32 | float64", 
+    "default" : "float32"
+    },
+"plot_freq" : {
+    "description" : "plot and print solution frequency, <0 is not", 
+    "default" : -1
+    },
+"RePlAce_ref_hpwl" : {
+    "description" : "reference HPWL used for updating density weight", 
+    "default" : 1e6
+    },
+"OVLP_LOWER_PCOF" : {
+    "description" : "lower bound ratio used for updating density weight", 
+    "default" : 0.95
+    },
+"OVLP_UPPER_PCOF" : {
+    "description" : "upper bound ratio used for updating density weight", 
+    "default" : 1.05
+    },
+"eta" : {
+    "description" : "coefficient in the exp relation of theta",
+    "default" : 0.5
+    },
+"gamma" : {
+    "description" : "order of the thermal penalty",
+    "default" : 4
+    },
+"random_center_init_flag" : {
+    "description" : "whether perform random initialization around the center for global placement", 
+    "default" : 0
+    },
+"num_threads" : {
+    "description" : "number of CPU threads", 
+    "default" : 32
+    }
+}

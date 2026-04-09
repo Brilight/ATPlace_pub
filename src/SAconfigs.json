@@ -1,0 +1,8 @@
+{
+    "T": 1,
+    "T_min": 0.01,
+    "alpha": 0.9,
+    "jumping_ratio": 0.9,
+    "granularity": 500,
+    "decay": 0.95
+}
