@@ -11,7 +11,7 @@ from utils.uscs_parser import word_split, blank_line
 from utils.uscs_parser import Modules
 
 
-def parse_pl(lines: list[str], i: int, modules: Modules) -> bool:
+def parse_pl(lines: List[str], i: int, modules: Modules) -> bool:
     if blank_line(lines[i]):
         return True
     words = word_split(lines[i])

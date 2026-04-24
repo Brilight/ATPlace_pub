@@ -17,7 +17,7 @@ from Interposer import Passive_Interposer
 from Params import Params
 
 
-def read_data(param_file, spec_param_file=None, param_print=False):
+def read_data(param_file=None, spec_param_file=None, param_print=False, case_dir=None):
 
     params = Params()
     if param_print:
@@ -26,19 +26,31 @@ def read_data(param_file, spec_param_file=None, param_print=False):
         elif len(sys.argv) != 2:
             print("[E] One input parameters in json format in required")
             params.printHelp()
-    params.load(param_file)
+    if param_file is not None:
+        params.load(param_file)
     if spec_param_file is not None:
         params.load(spec_param_file)
     np.random.seed(params.random_seed)
+
+    if case_dir is not None:
+        case_dir = os.path.abspath(case_dir)
+        case_name = os.path.basename(os.path.normpath(case_dir))
+        params.prefix = os.path.join(case_dir, case_name)
 
     try:
         prefix = params.prefix
         args = [prefix+".blocks", prefix+".nets", prefix+".pl"]
         powerfile = prefix+'.power'
     except:
-        params.prefix = params.block_file.split("/")[-1]
-        powerfile = params.power_file
-        args = [params.block_file, params.net_file, params.pl_file]        
+        if hasattr(params, "block_file") and getattr(params, "block_file"):
+            params.prefix = params.block_file.split("/")[-1]
+            powerfile = params.power_file
+            args = [params.block_file, params.net_file, params.pl_file]
+        else:
+            raise ValueError(
+                "Cannot resolve input files. Provide case_dir (recommended) or set "
+                "params.prefix or params.block_file/net_file/pl_file/power_file."
+            )
     # read database 
     configs = parse_uscs(None, args)
     modules, headers = parse_blocks(configs)
@@ -107,12 +119,39 @@ def read_data(param_file, spec_param_file=None, param_print=False):
                     continue
                 _, intp_width, intp_height = line.split()
     """
-    intp_width, intp_height = params.interposer_size
+    fence_w = getattr(params, "fence_width", 0) or 0
+    fence_h = getattr(params, "fence_height", 0) or 0
+
+    intp_size_cfg = getattr(params, "interposer_size", None)
+    if (
+        intp_size_cfg is None
+        or (isinstance(intp_size_cfg, (list, tuple)) and len(intp_size_cfg) < 2)
+        or (isinstance(intp_size_cfg, str) and not intp_size_cfg.strip())
+    ):
+        chiplet_areas = []
+        max_w = 0.0
+        max_h = 0.0
+        for module_name in modules["Modules"].keys():
+            if "rectangles" in modules["Modules"][module_name].keys():
+                _, _, w, h = modules["Modules"][module_name]["rectangles"][0]
+                w = float(w)
+                h = float(h)
+                chiplet_areas.append(w * h)
+                max_w = max(max_w, w)
+                max_h = max(max_h, h)
+        area_sum = float(np.sum(chiplet_areas)) if chiplet_areas else 0.0
+        side = max((area_sum**0.5) * 1.5, max(max_w, max_h) * 2.0)
+        intp_width = side + 2.0 * float(fence_w)
+        intp_height = side + 2.0 * float(fence_h)
+        params.interposer_size = [float(intp_width), float(intp_height)]
+    else:
+        intp_width, intp_height = intp_size_cfg
+
     intp_size = [float(intp_width), float(intp_height)]
     logging.info(f"Interposer size: {intp_size[0]:.2f}, {intp_size[1]:.2f} um\n")
     interposer.set_interposer_size(intp_size)
-    fence = [params.fence_width, interposer.width-params.fence_width,
-             params.fence_height, interposer.height-params.fence_height]
+    fence = [float(fence_w), interposer.width - float(fence_w),
+             float(fence_h), interposer.height - float(fence_h)]
     system.set_interposer_size(fence, interposer)
     system.set_bins(params)
     system.initialize()

@@ -4,14 +4,14 @@
 
 import re
 import typing
-from typing import Union, List
+from typing import Union, List, Tuple
 from argparse import ArgumentParser
 
 from utils.uscs_parser import word_split, blank_line
 from utils.uscs_parser import Net, Nets, Headers
 
 
-def parse_header(lines: list[str], i: int, headers: Headers):
+def parse_header(lines: List[str], i: int, headers: Headers):
     defined_headers = {
         'NumNets': (int, 0),
         'NumPins': (int, 0) }
@@ -33,7 +33,7 @@ def parse_header(lines: list[str], i: int, headers: Headers):
         headers[words[0]] = words[2]
     return True
 
-def parse_net_line(lines: list[str], i: int, net: Net):
+def parse_net_line(lines: List[str], i: int, net: Net):
     if blank_line(lines[i]):
         return False
     words = word_split(lines[i])
@@ -47,7 +47,7 @@ def parse_net_line(lines: list[str], i: int, net: Net):
         net.append(words[0])
     return True
 
-def parse_net(lines: list[str], i: int, nets: Nets) -> tuple[bool, int]:
+def parse_net(lines: List[str], i: int, nets: Nets) -> Tuple[bool, int]:
     if blank_line(lines[i]):
         return True, i+1
     words = word_split(lines[i])

@@ -44,6 +44,15 @@ We are committed to open-sourcing more components of ATPlace in the future. Spec
 3. Set up HotSpot-7.0 and use the provided thermal configuration files for thermal modeling.
 4. Results can be compared with the published data in our paper.
 
+### Reproduce (Public Runner)
+```bash
+python -m pip install -r src/requirements.txt
+python src/reproduce.py --case cases/Case1
+```
+
+- The command prints the output directory, which contains `metrics.json`, `placement.npz`, and generated figures.
+- Notebook entry point: `Reproduce.ipynb`
+
 ## Citation 📋
 If you find this repository useful for your research, please consider citing our ICCAD 2024 paper:
     

@@ -11,7 +11,7 @@ from utils.uscs_parser import word_split, blank_line
 from utils.uscs_parser import Modules, Headers
 
 
-def parse_terminals(lines: list[str], i: int, modules: Modules):
+def parse_terminals(lines: List[str], i: int, modules: Modules):
     if blank_line(lines[i]):
         return True
     words = word_split(lines[i])
@@ -23,7 +23,7 @@ def parse_terminals(lines: list[str], i: int, modules: Modules):
     return False
 
 
-def parse_rectangles(lines: list[str], i: int, modules: Modules) -> bool:
+def parse_rectangles(lines: List[str], i: int, modules: Modules) -> bool:
     if blank_line(lines[i]):
         return True
     words = word_split(lines[i])
@@ -78,7 +78,7 @@ def parse_rectangles(lines: list[str], i: int, modules: Modules) -> bool:
         return False
 
 
-def parse_header(lines: list[str], i: int, headers: Headers):
+def parse_header(lines: List[str], i: int, headers: Headers):
     defined_headers = {
         'NumSoftRectangularBlocks': (int, 0),
         'NumHardRectilinearBlocks': (int, 0),

@@ -4,13 +4,13 @@
 
 import re
 import typing
-from typing import Union, List
+from typing import Union, List, Dict, Any
 from argparse import ArgumentParser
 
-Modules = dict[str, dict[str, typing.Any]]
-Headers = dict[str, typing.Any]
-Net = list[typing.Any]
-Nets = list[Net]
+Modules = Dict[str, Dict[str, Any]]
+Headers = Dict[str, Any]
+Net = List[Any]
+Nets = List[Net]
 
 
 def blank_line(line: str):
@@ -23,7 +23,7 @@ def blank_line(line: str):
     return False
 
 
-def word_split(line: str) -> list[str]:
+def word_split(line: str) -> List[str]:
     return re.split(r'[\s\n\t]+', line)
 
 

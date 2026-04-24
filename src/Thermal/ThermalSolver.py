@@ -2,15 +2,26 @@ import os
 import csv
 import time
 import json
-import yaml
 import subprocess
 
-import gdspy
 import numpy as np
 
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
-from scipy.interpolate import griddata
+try:
+    import yaml
+except ModuleNotFoundError:
+    yaml = None
+
+try:
+    import gdspy
+except ModuleNotFoundError:
+    gdspy = None
+
+try:
+    from scipy.interpolate import griddata
+except ModuleNotFoundError:
+    griddata = None
 
 import utils.fill_space
 
@@ -207,6 +218,10 @@ class ATSim_solver(Thermal_solver):
         return pretty_xml
     
     def gen_flp_and_power(self, dir_name, alpha=0.8, T_base=85, gamma=0.015):
+        if gdspy is None:
+            raise RuntimeError("Missing dependency: gdspy")
+        if yaml is None:
+            raise RuntimeError("Missing dependency: pyyaml")
         library = gdspy.GdsLibrary()
         layer = 1
         datatype = 0
@@ -282,6 +297,8 @@ class ATSim_solver(Thermal_solver):
             os.system(" ".join(cmd))
     
     def getres(self, dir_name):
+        if griddata is None:
+            raise RuntimeError("Missing dependency: scipy")
         res = np.loadtxt(os.path.join(self.path, f"{dir_name}/raw/steadytemp.txt"))
         z_min = self.z_origin
         z_max = self.z_origin+1e-6
@@ -348,6 +365,8 @@ class Warpage_solver(ATSim_solver):
             os.system(" ".join(cmd))
     
     def getres(self, dir_name):
+        if griddata is None:
+            raise RuntimeError("Missing dependency: scipy")
         res = np.loadtxt(os.path.join(self.path, f"{dir_name}/raw/steadytemp.txt"))
         #print(np.unique(res[:,4]), np.unique(res[:,5]))
         z_min = self.z_origin
@@ -504,6 +523,10 @@ class HotSpot_solver(Thermal_solver):
                         Config_out.write(line.replace('0.06',str(size_heatsink)))
                     elif 's_spreader' in line:
                         Config_out.write(line.replace('0.03',str(size_spreader)))
+                    elif '-grid_rows' in line:
+                        Config_out.write(f"\t\t-grid_rows\t\t\t{self.num_grid_x}\n")
+                    elif '-grid_cols' in line:
+                        Config_out.write(f"\t\t-grid_cols\t\t\t{self.num_grid_y}\n")
                     elif line == '		-r_convec			0.1\n':
                         Config_out.write(line.replace('0.1',str(r_convec)))
                     else:

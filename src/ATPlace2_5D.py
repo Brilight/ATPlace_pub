@@ -37,35 +37,15 @@ def hyper_param_search(default_params, n_trials, SpecParams):
         
         param_dict = {
             "@trial ": trial.number,
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
             "lambda_iter": trial.suggest_int("lambda_iter", 1, 5),
             "sub_iter": trial.suggest_int("sub_iter", 1, 5),
             "LR": [trial.suggest_float("lr_pos", 5e-2, 1e0, log=False),
                    trial.suggest_float("lr_ang", 1e-2, 1e-1, log=False)],
             "eta": trial.suggest_float("eta", 0.1, 1, log=False),
-<<<<<<< Updated upstream
             "target_density": trial.suggest_float("target_density", 0.4, 1.0, log=False),
             "overflow_init": trial.suggest_float("overflow_init", 0.2, 0.5, log=False),
             "wl_weight" : trial.suggest_float("wl_weight", 1e-2, 1, log=False),
             "density_weight_init": trial.suggest_float("density_weight_init", 1e-1, 100, log=True),
-=======
-            "LR": [trial.suggest_float("lr_pos", 0.01, 10, log=True),
-                   trial.suggest_float("lr_ang", 1e-3, 1e-1, log=True)],
-            "eta": trial.suggest_float("eta", 0.1, 5, log=True),
-            "target_density": trial.suggest_float("target_density", 0.4, 1.0, log=False),
-            "overflow_init": trial.suggest_float("overflow_init", 0.2, 0.5, log=False),
-            "wl_weight": trial.suggest_float("wl_weight", 0, 5, log=False),
-            "gamma": 1, #trial.suggest_int("gamma", 2, 8), 
->>>>>>> 95d9ac5b2f204d3011d6c4162d4c3e1389010243
-=======
-            "target_density": trial.suggest_float("target_density", 0.4, 1.0, log=False),
-            "overflow_init": trial.suggest_float("overflow_init", 0.2, 0.5, log=False),
-            "wl_weight" : trial.suggest_float("wl_weight", 1e-2, 1, log=False),
-            "density_weight_init": trial.suggest_float("density_weight_init", 1e-1, 100, log=True),
->>>>>>> Stashed changes
         }
         for key, value in param_dict.items():
             if type(value) is int:
@@ -85,22 +65,9 @@ def hyper_param_search(default_params, n_trials, SpecParams):
             params.temp_aware_opt = False
 
             fp_parms = params.floorplan_stages[0]
-<<<<<<< Updated upstream
-<<<<<<< HEAD
             fp_parms["iteration"] = 500
             fp_parms["Llambda_density_weight_iteration"] = param_dict["lambda_iter"]
             fp_parms["Lsub_iteration"] = param_dict["sub_iter"]
-=======
-            fp_parms["iteration"] = 200
-            fp_parms["Llambda_density_weight_iteration"] = 2 
-            #trial.suggest_int("lambda_iter", 1, 5)
-            fp_parms["Lsub_iteration"] = 5 # trial.suggest_int("sub_iter", 1, 5)
->>>>>>> 95d9ac5b2f204d3011d6c4162d4c3e1389010243
-=======
-            fp_parms["iteration"] = 500
-            fp_parms["Llambda_density_weight_iteration"] = param_dict["lambda_iter"]
-            fp_parms["Lsub_iteration"] = param_dict["sub_iter"]
->>>>>>> Stashed changes
             fp_parms["learning_rate"] = [
                 param_dict['LR'][0]*system.grid_size, param_dict['LR'][1]*np.pi
             ]
@@ -109,18 +76,8 @@ def hyper_param_search(default_params, n_trials, SpecParams):
             params.target_density = param_dict["target_density"]
             params.overflow_init = param_dict["overflow_init"]
             params.wl_weight = param_dict["wl_weight"]/system.num_nets
-<<<<<<< Updated upstream
-<<<<<<< HEAD
             params.density_weight_init = param_dict["density_weight_init"]
             #params.plot_freq = -1
-=======
-            params.density_weight_init = 1 
-            params.plot_freq = -1
->>>>>>> 95d9ac5b2f204d3011d6c4162d4c3e1389010243
-=======
-            params.density_weight_init = param_dict["density_weight_init"]
-            #params.plot_freq = -1
->>>>>>> Stashed changes
             
             try:
                 hpwl, _, _ = ATPlace_core(params, system)
@@ -131,13 +88,6 @@ def hyper_param_search(default_params, n_trials, SpecParams):
                 import traceback
                 traceback.print_exc()
                 raise optuna.TrialPruned()
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-=======
-        print(wlres)
->>>>>>> 95d9ac5b2f204d3011d6c4162d4c3e1389010243
-=======
->>>>>>> Stashed changes
         return wl_counter
     
     study = optuna.create_study(directions=["minimize"])
@@ -281,15 +231,7 @@ def ATPlace_core(params, system):
     hpwl, best_metric, best_pos = placeflow(
         params, system, tempmodel, temp_solver
     )    
-<<<<<<< Updated upstream
-<<<<<<< HEAD
     print(f"Final wirelength: {hpwl/1e6:.3f}m within {time.perf_counter()-t1:.3f}s")
-=======
-    print(time.perf_counter()-t1)
->>>>>>> 95d9ac5b2f204d3011d6c4162d4c3e1389010243
-=======
-    print(f"Final wirelength: {hpwl/1e6:.3f}m within {time.perf_counter()-t1:.3f}s")
->>>>>>> Stashed changes
     return hpwl, best_metric, best_pos
 
     max_intp_size = int(system.area_cplt**0.5)/2

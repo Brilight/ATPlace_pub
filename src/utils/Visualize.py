@@ -99,8 +99,10 @@ def plot_temp_and_warpage(system, temp_data, warpage_data=None, save_path=None):
 
     plt.tight_layout()
     if save_path:
-        fig.savefig(save_path, format='pdf', dpi=150, bbox_inches='tight')
-    plt.show()
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+        plt.close(fig)
+    else:
+        plt.show()
 
 def plot_temp_single(ax, system, data, levels, show_cplt, title, cmap_name):
     """Helper for single plot"""
