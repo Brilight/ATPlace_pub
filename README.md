@@ -1,4 +1,4 @@
-# ATPlace2..5D 🌟
+# ATPlace2.5D
 
 This repository contains the public materials for the ICCAD 2024 paper **ATPlace2.5D**. Due to intellectual property restrictions, we are unable to directly provide the core code of ATPlace 🔒. However, this repository includes the following resources:
 
@@ -10,7 +10,7 @@ In the future, we plan to release a compiled version of the ATPlace code to furt
 
 ---
 
-## Repository Contents 📂
+## Repository Contents
 
 ### Test Cases 
 The test cases are organized into **10 folders** (`Case1` to `Case10`), each containing the following files:
@@ -23,11 +23,8 @@ These files are formatted based on the **Bookshelf format**, a widely-used stand
 
 ---
 
-### Thermal Configuration 🔥
-The thermal modeling is performed using **HotSpot-7.0**, an open-source thermal modeling tool. To use the thermal configuration provided here, follow these steps:
-1. Clone or download HotSpot-7.0 from its official repository at https://github.com/uvahotspot/HotSpot.git.
-2. Compile HotSpot-7.0 on your system.
-3. Use the thermal configuration files provided in this repository as input to HotSpot.
+### Thermal Configuration
+This repo vendors a HotSpot binary and default configs under `thermal/`. The public runner uses it for thermal evaluation and dataset generation in thermal-aware mode.
 
 ---
 
@@ -36,22 +33,31 @@ We are committed to open-sourcing more components of ATPlace in the future. Spec
 
 ---
 
-## How to Use This Repository 🛠️
+## How to Use This Repository
 1. Clone the repository:
    ```bash
    git clone https://github.com/Brilight/ATPlace_pub.git
 2. Explore the test cases in the cases directory.
-3. Set up HotSpot-7.0 and use the provided thermal configuration files for thermal modeling.
 4. Results can be compared with the published data in our paper.
 
 ### Reproduce (Public Runner)
+Each case stores its own reproducible parameters in `cases/CaseX/reproduce.json`.
+
 ```bash
 python -m pip install -r src/requirements.txt
-python src/reproduce.py --case cases/Case1
+python src/reproduce.py --case cases/Case1 --mode both
 ```
 
-- The command prints the output directory, which contains `metrics.json`, `placement.npz`, and generated figures.
-- Notebook entry point: `Reproduce.ipynb`
+- The command reads `cases/Case1/reproduce.json`.
+- Outputs are written to `results/<CaseName>/{wl,thermal}/`, including `metrics.json`, `placement.npz`, and `params_resolved.json`.
+
+### Batch Run
+```bash
+python src/reproduce.py --all --mode both --no-plots --skip-failed
+```
+
+- `--skip-failed` keeps batch reproduction running when a case has no feasible floorplan under its current parameters.
+- No Jupyter notebook is required for reproduction; use the CLI runner and per-case configs only.
 
 ## Citation 📋
 If you find this repository useful for your research, please consider citing our ICCAD 2024 paper:

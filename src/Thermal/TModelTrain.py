@@ -75,7 +75,7 @@ def Datagen(num_dataset, system, temp_solver, plot_flag=True):
             continue
         fencesize = 0
         powermap_tmp = np.array(system.powermap)        
-        temp_solver.set_pos(powermap_tmp, [np.array(pos[0]), np.array(pos[1])], [size_x, size_y])
+        temp_solver.set_pos(powermap_tmp, [np.array(pos[0]), np.array(pos[1])], size_x, size_y)
         t2 = time.time()
         temp_solver.run(temp_file_name)
         print(f"Takes {time.time()-t2:.2f} s for thermal simulation.")

@@ -24,7 +24,10 @@ class TModel(nn.Module):
 
     def forward(self, input_data):
         num_chiplets = self.num_chiplets
-        x, y, length, width, power, masks = input_data
+        if len(input_data) == 5:
+            x, y, length, width, power = input_data
+        else:
+            x, y, length, width, power, _masks = input_data
         X = self.xgrid[None,None,...].repeat(1, num_chiplets, 1, 1)
         Y = self.ygrid[None,None,...].repeat(1, num_chiplets, 1, 1)
         xc, yc = x.reshape(-1,num_chiplets,1,1), y.reshape(-1,num_chiplets,1,1)
@@ -82,7 +85,10 @@ class TModel_leak(nn.Module):
                 nn.init.zeros_(layer.weight)
 
     def forward(self, input_data):
-        x, y, length, width, power, masks = input_data
+        if len(input_data) == 5:
+            x, y, length, width, power = input_data
+        else:
+            x, y, length, width, power, _masks = input_data
         batch_size = x.shape[0]
         num_chiplets = self.num_chiplets
         

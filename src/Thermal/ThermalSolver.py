@@ -3,6 +3,7 @@ import csv
 import time
 import json
 import subprocess
+from pathlib import Path
 
 import numpy as np
 
@@ -400,8 +401,18 @@ class HotSpot_solver(Thermal_solver):
         super(HotSpot_solver, self).__init__(system, 3, system.thermal_dir)
         
     def clean_hotspot(self):
-        os.system('rm ' + self.path + '{*.flp,*.lcf,*.ptrace,*.steady}')
-        os.system('rm ' + self.path + 'new_hotspot.config')
+        base = Path(self.path)
+        patterns = ["*.flp", "*.lcf", "*.ptrace", "*.steady", "*.grid.steady"]
+        for pat in patterns:
+            for p in base.glob(pat):
+                try:
+                    p.unlink()
+                except FileNotFoundError:
+                    pass
+        try:
+            (base / "new_hotspot.config").unlink()
+        except FileNotFoundError:
+            pass
 
     def gen_flp(self, filename):
         # material properties

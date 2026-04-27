@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "defaults": {
+    "ILPsolver": "pulp",
+    "thermal_solver": "hotspot"
+  },
+  "wl": {
+    "interposer_size": [
+      42000.0,
+      42000.0
+    ],
+    "num_thermal_dataset": 1,
+    "gamma": 5,
+    "eta": 0.6,
+    "target_density": 0.4,
+    "overflow_init": 0.5,
+    "density_weight_init": 1,
+    "wl_weight": 0.01,
+    "temp_weight_init": 72,
+    "temp_threshold": 82,
+    "floorplan_stages": [
+      {
+        "iteration": 200,
+        "learning_rate": [
+          100,
+          0.005
+        ],
+        "learning_rate_decay": 0.995,
+        "optimizer": "cgm",
+        "Llambda_density_weight_iteration": 2,
+        "Lsub_iteration": 5
+      }
+    ]
+  },
+  "thermal": {
+    "temp_aware_opt": true,
+    "interposer_size": [
+      42000.0,
+      42000.0
+    ],
+    "num_thermal_dataset": 1,
+    "gamma": 7,
+    "eta": 1.5686850788684255,
+    "target_density": 0.4184133907286792,
+    "overflow_init": 0.4167169264760177,
+    "density_weight_init": 984.6745718198002,
+    "wl_weight": 0.009405632070719603,
+    "temp_weight_init": 2.528961060911423,
+    "temp_threshold": 0.7597154552919694,
+    "floorplan_stages": [
+      {
+        "iteration": 500,
+        "learning_rate": [
+          3.400334832776336,
+          0.02399957584540233
+        ],
+        "learning_rate_decay": 0.995,
+        "optimizer": "cgm",
+        "Llambda_density_weight_iteration": 1,
+        "Lsub_iteration": 2
+      }
+    ]
+  }
+}
