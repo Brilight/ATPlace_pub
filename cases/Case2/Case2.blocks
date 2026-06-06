@@ -1,0 +1,10 @@
+NumSoftRectangularBlocks : 0
+NumHardRectilinearBlocks : 6
+NumTerminals : 0
+
+HBM_0 hardrectilinear 4 (0, 0) (0, 12000) (8000, 12000) (8000, 0)
+HBM_1 hardrectilinear 4 (0, 0) (0, 12000) (8000, 12000) (8000, 0)
+HBM_2 hardrectilinear 4 (0, 0) (0, 12000) (8000, 12000) (8000, 0)
+HBM_3 hardrectilinear 4 (0, 0) (0, 12000) (8000, 12000) (8000, 0)
+Virtuvian_0 hardrectilinear 4 (0, 0) (0, 14500) (31400, 14500) (31400, 0)
+Nimbus_0 hardrectilinear 4 (0, 0) (0, 16000) (10500, 16000) (10500, 0)

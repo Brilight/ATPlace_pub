@@ -1,0 +1,15 @@
+NumSoftRectangularBlocks : 0
+NumHardRectilinearBlocks : 11
+NumTerminals : 0
+
+CPU1_0 hardrectilinear 4 (0, 0) (0, 12000) (12000, 12000) (12000, 0)
+CPU1_1 hardrectilinear 4 (0, 0) (0, 12000) (12000, 12000) (12000, 0)
+GPU_0 hardrectilinear 4 (0, 0) (0, 18000) (18000, 18000) (18000, 0)
+GPU_1 hardrectilinear 4 (0, 0) (0, 18000) (18000, 18000) (18000, 0)
+GPU_2 hardrectilinear 4 (0, 0) (0, 18000) (18000, 18000) (18000, 0)
+GPU_3 hardrectilinear 4 (0, 0) (0, 18000) (18000, 18000) (18000, 0)
+HBM_0 hardrectilinear 4 (0, 0) (0, 12000) (8000, 12000) (8000, 0)
+HBM_1 hardrectilinear 4 (0, 0) (0, 12000) (8000, 12000) (8000, 0)
+HBM_2 hardrectilinear 4 (0, 0) (0, 12000) (8000, 12000) (8000, 0)
+HBM_3 hardrectilinear 4 (0, 0) (0, 12000) (8000, 12000) (8000, 0)
+HBM_4 hardrectilinear 4 (0, 0) (0, 12000) (8000, 12000) (8000, 0)

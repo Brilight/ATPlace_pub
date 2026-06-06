@@ -1,0 +1,25 @@
+{
+  "ILPsolver": "grb",
+  "density_weight_init": 984.67,
+  "eta": 1.5687,
+  "floorplan_stages": [
+    {
+      "Llambda_density_weight_iteration": 2,
+      "Lsub_iteration": 5,
+      "learning_rate": [
+        3.4003,
+        0.024
+      ],
+      "learning_rate_decay": 0.995,
+      "optimizer": "cgm"
+    }
+  ],
+  "gamma": 7,
+  "overflow_init": 0.41672,
+  "target_density": 0.41841,
+  "temp_aware_opt": true,
+  "temp_threshold": 0.75972,
+  "temp_weight_init": 2.529,
+  "thermal_solver": "hotspot",
+  "wl_weight": 0.0094056
+}
