@@ -40,6 +40,78 @@ CASE_INTERPOSER_SIZE = {
 }
 
 
+def build_compact_model(params: Params.Params, system: System_25D):
+    if not params.temp_aware_opt:
+        return None
+
+    import torch
+    import torch.nn as nn
+
+    class AnalyticThermalModel(nn.Module):
+        def __init__(self, width, height, num_chiplets, num_grid_x, num_grid_y):
+            super().__init__()
+            self.width = width
+            self.height = height
+            self.num_chiplets = num_chiplets
+            xgrid = (torch.arange(num_grid_x) + 0.5) / num_grid_x * width
+            ygrid = (torch.arange(num_grid_y) + 0.5) / num_grid_y * height
+            xgrid, ygrid = torch.meshgrid(xgrid, ygrid, indexing="ij")
+            self.register_buffer("xgrid", xgrid[None, None])
+            self.register_buffer("ygrid", ygrid[None, None])
+            self.amp = nn.Parameter(torch.ones(1) * 1e3)
+            self.bias = nn.Parameter(torch.zeros(1))
+            self.heff = nn.Parameter(torch.ones(1))
+            self.decay = nn.Parameter(torch.ones(1, num_chiplets, 1, 2))
+
+        def forward(self, input_data):
+            x, y, length, width, power = input_data
+            chips = self.num_chiplets
+            batch = x.shape[0]
+            xc = x.view(-1, chips, 1, 1)
+            yc = y.view(-1, chips, 1, 1)
+            lc = length.view(-1, chips, 1, 1)
+            wc = width.view(-1, chips, 1, 1)
+            xgrid = self.xgrid.expand(batch, chips, -1, -1)
+            ygrid = self.ygrid.expand(batch, chips, -1, -1)
+            power = power.reshape(-1, chips, 1, 1)
+            val = self._main_term(xgrid - xc, ygrid - yc, lc, wc)
+            return (power * (self.amp * val + self.bias)).sum(dim=1, keepdim=True)
+
+        def _main_term(self, xdist, ydist, length, width):
+            decay = self.decay
+            ax = decay[..., :1]
+            ay = decay[..., 1:2]
+            val = (
+                self._fabc(self.heff, ax * (length / 2 - xdist), ay * (width / 2 - ydist))
+                + self._fabc(self.heff, ax * (length / 2 - xdist), ay * (width / 2 + ydist))
+                + self._fabc(self.heff, ax * (length / 2 + xdist), ay * (width / 2 - ydist))
+                + self._fabc(self.heff, ax * (length / 2 + xdist), ay * (width / 2 + ydist))
+            )
+            return val / length / width
+
+        @staticmethod
+        def _fabc(a, b, c):
+            a = a.double()
+            b = b.double()
+            c = c.double()
+            delta = torch.sqrt(a**2 + b**2 + c**2)
+            val = (
+                b * torch.log((c + delta) / (a**2 + b**2) ** 0.5)
+                + c * torch.log((b + delta) / (a**2 + c**2) ** 0.5)
+                - a * torch.arctan(b * c / a / delta)
+            )
+            return val.float()
+
+    thermal = AnalyticThermalModel(
+        system.intp_width,
+        system.intp_height,
+        system.num_chiplets,
+        system.num_grid_x,
+        system.num_grid_y,
+    )
+    return {"Thermal": thermal}
+
+
 def load_json(path: Path) -> dict:
     with path.open(encoding="utf-8") as handle:
         return json.load(handle)
@@ -145,6 +217,8 @@ def build_system(case_dir: Path, case_name: str, params: Params.Params) -> Syste
     ]
     system.set_interposer_size(fence, interposer)
     system.set_bins(params)
+    system.num_grid_x = params.num_grid_x
+    system.num_grid_y = params.num_grid_y
     system.initialize()
     system.set_granularity(params.reso_interposer)
     system.area_cplt = (np.array(system.node_size_x) * np.array(system.node_size_y)).sum()
@@ -189,9 +263,10 @@ def main() -> int:
 
     params = load_params(param_file, args.case, out_dir)
     system = build_system(case_dir, args.case, params)
+    compact_model = build_compact_model(params, system)
 
     start = time.time()
-    result = placeflow_core(params, system, None)
+    result = placeflow_core(params, system, compact_model)
     hpwl, best_fp = unpack_result(result)
     summary = {
         "case": args.case,

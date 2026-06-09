@@ -24,6 +24,7 @@ class System_25D:
         self.node_size_x = []
         self.node_size_y = []
         self.node_orient = []
+        self.node_flip = []
         # Rotation angle theta recorded by [0,1,2,3], multiplied by pi/2 when used 
         
         self.pin_offset_x = [] 
@@ -38,6 +39,11 @@ class System_25D:
         self.pin2net_map = [] # 1D array, contain parent net idx of each pin
         self.netid_2pin = []
         self.netid_multipin = []
+    
+    def update_pos(self, node_x, node_y, node_orient):
+        self.node_x = node_x
+        self.node_y = node_y
+        self.node_orient = node_orient
 
     def append_chiplet(self, chiplet_name, chiplet_new):
         self.node_names.append(chiplet_name)
@@ -78,13 +84,11 @@ class System_25D:
         self.node_y = np.array(self.node_y, dtype=self.dtype)
         self.node_size_x = np.array(self.node_size_x, dtype=self.dtype)
         self.node_size_y = np.array(self.node_size_y, dtype=self.dtype)
-        self.node_size_x_raw = deepcopy(self.node_size_x)
-        self.node_size_y_raw = deepcopy(self.node_size_y)
         self.node_area = self.node_size_x*self.node_size_y
         self.node_orient = np.array(self.node_orient, dtype=self.dtype)
         self.pin_offset_x = np.array(self.pin_offset_x, dtype=self.dtype)
         self.pin_offset_y = np.array(self.pin_offset_y, dtype=self.dtype)
-        for pin in range(self.num_pins):
+        for pin in range(len(self.pin2node_map)):
             node = self.pin2node_map[pin]
             self.pin_offset_x[pin] *= self.node_size_x[node]/100
             self.pin_offset_y[pin] *= self.node_size_y[node]/100
@@ -139,7 +143,6 @@ class System_25D:
             if 0.95 < params.num_bins_x/params.num_bins_y <1.05:
                 self.num_bins_x = params.num_bins_x
                 self.num_bins_y = params.num_bins_y
-            print(f"Number of bins_x and bins_y are {self.num_bins_x}, {self.num_bins_y}.")
         except:
             self.num_bins_x = int(math.pow(2, max(np.ceil(math.log2(self.num_chiplets / aspect_ratio)/2), 0)))
             self.num_bins_y = int(math.pow(2, max(np.ceil(math.log2(self.num_chiplets * aspect_ratio)/2), 0)))
@@ -150,10 +153,11 @@ class System_25D:
         self.bin_size_y = (self.yhigh-self.ylow)/self.num_bins_y
 
         # bin center array
-        self.bin_center_x = self.bin_centers(0, self.intp_width, self.num_bins_x)
-        self.bin_center_y = self.bin_centers(0, self.intp_height, self.num_bins_y)
+        self.bin_center_x = self.bin_centers(self.xlow, self.xhigh, self.num_bins_x)
+        self.bin_center_y = self.bin_centers(self.ylow, self.yhigh, self.num_bins_y)
         self.num_bins_x += 2
         self.num_bins_y += 2
+        print(f"Number of bins_x and bins_y are {self.num_bins_x}, {self.num_bins_y}.")
         
     def flatten_nested_map(self, net2pin_map): 
         """
@@ -176,11 +180,17 @@ class System_25D:
         return flat_net2pin_map, flat_net2pin_start_map
     
     def rotate(self, idx, theta):
-        self.node_orient[idx] = theta        
-        r = np.int32(np.abs(np.cos(self.node_orient[idx])))
-        self.node_size_x[idx] = self.node_size_x_raw[idx]*r+self.node_size_y_raw[idx]*(1-r)
-        self.node_size_y[idx] = self.node_size_x_raw[idx]*(1-r)+self.node_size_y_raw[idx]*r
-            
+        
+        r = np.int32((self.node_orient[idx]-theta)/np.pi*2)%2 #np.abs(np.cos(self.node_orient[idx])))
+        self.node_orient[idx] = theta
+        tmp_size = self.node_size_x[idx]+self.node_size_y[idx]
+        self.node_size_x[idx] = np.where(r==1, self.node_size_y[idx], self.node_size_x[idx])
+        self.node_size_y[idx] = tmp_size - self.node_size_x[idx]
+        if hasattr(self, 'distance'):
+            self.node_size_x_dis = self.node_size_x+self.distance
+            self.node_size_y_dis = self.node_size_y+self.distance
+        return self.node_size_x, self.node_size_y
+        
     def net_hpwl(self, x, y, r, net_id):
         """
         @brief compute HPWL of a net
@@ -193,7 +203,7 @@ class System_25D:
         if len(np.unique(nodes))<2:
             return 0
         angle = self.node_orient[nodes]
-        cos, sin = np.cos(angle), np.sin(angle)
+        cos, sin = np.int32(np.cos(angle)), np.int32(np.sin(angle))
         pinx = x[nodes]+self.pin_offset_x[pins]*cos-self.pin_offset_y[pins]*sin
         hpwl_x = np.amax(pinx) - np.amin(pinx)
         piny = y[nodes]+self.pin_offset_x[pins]*sin+self.pin_offset_y[pins]*cos

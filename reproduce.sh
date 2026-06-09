@@ -35,6 +35,17 @@ python_bin="${PYTHON:-python3}"
 stamp="$(date +%Y%m%d_%H%M%S)"
 out_dir="${ATPLACE_OUT_DIR:-${script_dir}/results/${case_name}_${mode}_${stamp}}"
 
+if [[ -z "${USERNAME:-}" ]]; then
+  USERNAME="${USER:-}"
+fi
+if [[ -z "${USERNAME}" ]]; then
+  USERNAME="$(id -un)"
+fi
+export USERNAME
+export USER="${USER:-${USERNAME}}"
+export LOGNAME="${LOGNAME:-${USERNAME}}"
+export LC_ALL=C
+
 echo "case_dir=${case_dir}"
 echo "param_file=${param_file}"
 echo "out_dir=${out_dir}"
