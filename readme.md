@@ -9,7 +9,7 @@ This repository contains a compact public package for ATPlace2.5D.
 - `thermal/`: HotSpot files used by thermal evaluation.
 - `utils/`: parsers for case input files.
 - `Thermal.py`: thermal helper entry file.
-- `reproduce.sh`: minimal shell wrapper for selecting a case and placement mode.
+- `reproduce.sh`: shell entry for selecting a case and placement mode and starting the encrypted layout kernel.
 
 ## Usage
 
@@ -22,14 +22,37 @@ Each case directory contains Bookshelf input files and two layout parameter file
 
 `pulp` may work in some environments, but it is not guaranteed to produce strictly identical legal placement or numerical values. Use `gurobipy` when reproducing reported layouts.
 
-Run the wrapper as:
+On the 231 server, activate the reproduction environment first:
+
+```bash
+conda activate ATPlan
+```
+
+Run one case as:
 
 ```bash
 bash reproduce.sh Case1 wl
 bash reproduce.sh Case1 thermal
 ```
 
-The first argument is one of `Case1` through `Case10`. The second argument is `wl` or `thermal`. The wrapper prints the selected case directory and parameter file, which can be passed to the encrypted layout kernel together with the case input files.
+The first argument is one of `Case1` through `Case10`. The second argument is `wl` or `thermal`.
+
+The command selects:
+
+- input files from `cases/<CaseX>/`;
+- `WL-driven.json` for `wl`;
+- `Thermal-aware.json` for `thermal`;
+- output directory `results/<CaseX>_<mode>_<timestamp>/` unless `ATPLACE_OUT_DIR` is set.
+
+Then it calls `reproduce.py`, which loads the selected Bookshelf files and parameter file and invokes the encrypted `ATPLACE.PlaceFlow.placeflow_core` kernel. A successful execution writes `summary.json` in the output directory.
+
+Optional environment variables:
+
+```bash
+PYTHON=/path/to/python bash reproduce.sh Case1 wl
+ATPLACE_OUT_DIR=/tmp/case1_wl bash reproduce.sh Case1 wl
+ATPLACE_DRY_RUN=1 bash reproduce.sh Case1 wl
+```
 
 The case parameter files are self-contained layout settings. Do not change interposer geometry unless the target design itself changes.
 
