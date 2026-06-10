@@ -44,17 +44,74 @@ The command selects:
 - `Thermal-aware.json` for `thermal`;
 - output directory `results/<CaseX>_<mode>_<timestamp>/` unless `ATPLACE_OUT_DIR` is set.
 
-Then it calls `reproduce.py`, which loads the selected Bookshelf files and parameter file and invokes the encrypted `ATPLACE.PlaceFlow.placeflow_core` kernel. A successful execution writes `summary.json` in the output directory.
+Then it calls `reproduce.py`, which loads the selected Bookshelf files and parameter file and invokes the encrypted `ATPLACE.PlaceFlow.placeflow_core` kernel. A successful execution writes:
+
+- `summary.json`: selected case, mode, parameter file, output directory, HPWL/TWL, runtime, and whether a final layout was returned;
+- `layout.json`: final chiplet coordinates and chiplet sizes when the encrypted kernel returns a final layout.
 
 Optional environment variables:
 
 ```bash
 PYTHON=/path/to/python bash reproduce.sh Case1 wl
 ATPLACE_OUT_DIR=/tmp/case1_wl bash reproduce.sh Case1 wl
+ATPLACE_THERMAL_DIR=/path/to/thermal bash reproduce.sh Case1 thermal
 ATPLACE_DRY_RUN=1 bash reproduce.sh Case1 wl
 ```
 
 The case parameter files are self-contained layout settings. Do not change interposer geometry unless the target design itself changes.
+
+## Thermal-Aware Mode
+
+Thermal-aware placement uses two thermal components.
+
+1. `reproduce.py` creates a compact analytic thermal model object for the selected case and passes it into the encrypted placement kernel. The training and use of this compact model happen during the thermal-aware placement flow. No external pretrained thermal-model checkpoint is required in this public package.
+2. `thermal/` contains the HotSpot executable and the default HotSpot configuration. `Thermal.py` is the helper used to generate HotSpot floorplan, layer, power-trace, and configuration files from a chiplet layout. It is intentionally kept as readable Python so thermal stack parameters can be inspected or changed without exposing the encrypted placement implementation.
+
+The main thermal-aware layout controls are in `cases/<CaseX>/Thermal-aware.json`:
+
+- `temp_aware_opt`: enables the thermal-aware objective;
+- `temp_weight_init`, `temp_threshold`, and `gamma`: control the thermal penalty;
+- `wl_weight`: controls the wirelength term in the thermal-aware objective;
+- `target_density`, `density_weight_init`, `overflow_init`, and `eta`: control placement density and optimization behavior;
+- `floorplan_stages[0].learning_rate`: position and angle learning rates.
+
+Use these JSON files for ordinary parameter changes. Keep each case's `interposer_size` unchanged unless the physical case definition changes.
+
+## Changing Thermal Configuration
+
+For a new thermal configuration, copy the thermal directory and point the run to it:
+
+```bash
+cp -R thermal thermal_custom
+# edit thermal_custom/hotspot.config
+ATPLACE_THERMAL_DIR="$PWD/thermal_custom" bash reproduce.sh Case1 thermal
+```
+
+Use `Thermal.py` when the stack or generated HotSpot files must change. Examples include changing layer material constants, layer thicknesses, bump parameters, or how the HotSpot `.flp`, `.lcf`, and `.ptrace` files are generated. These edits affect thermal evaluation and the thermal-aware flow that depends on HotSpot output.
+
+For a new case, create `cases/<NewCase>/` with matching Bookshelf-style files:
+
+```text
+<NewCase>.blocks
+<NewCase>.nets
+<NewCase>.pl
+<NewCase>.power
+WL-driven.json
+Thermal-aware.json
+```
+
+Then either add the case interposer size to `CASE_INTERPOSER_SIZE` in `reproduce.py`, or include `interposer_size` in the case parameter JSON.
+
+## Layout Visualization
+
+After a successful run, generate a PNG from the exported layout:
+
+```bash
+python visualize_layout.py results/Case1_wl_YYYYMMDD_HHMMSS/layout.json
+python visualize_layout.py results/Case1_thermal_YYYYMMDD_HHMMSS/layout.json --out case1_thermal.png
+```
+
+The visualizer reads only `layout.json`. It does not call the encrypted placement kernel.
 
 ## Citation
 

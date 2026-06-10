@@ -122,6 +122,78 @@ def write_json(path: Path, data: dict) -> None:
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
+def to_plain(value):
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    if isinstance(value, np.generic):
+        return value.item()
+    if hasattr(value, "detach") and hasattr(value, "cpu") and hasattr(value, "numpy"):
+        return value.detach().cpu().numpy().tolist()
+    if isinstance(value, dict):
+        return {str(key): to_plain(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [to_plain(item) for item in value]
+    return value
+
+
+def flatten_numbers(value):
+    if isinstance(value, (int, float, np.number)):
+        return [float(value)]
+    if isinstance(value, (list, tuple)):
+        values = []
+        for item in value:
+            values.extend(flatten_numbers(item))
+        return values
+    return []
+
+
+def export_layout(best_fp, system: System_25D, params: Params.Params, case_name: str, mode: str) -> dict:
+    raw = to_plain(best_fp)
+    pos = raw
+    if isinstance(raw, dict):
+        for key in ("pos", "position", "best_fp", "best_fp_pos"):
+            if key in raw:
+                pos = raw[key]
+                break
+
+    chiplets = []
+    if isinstance(pos, list) and len(pos) >= 2:
+        xy = flatten_numbers(pos[0])
+        angles = flatten_numbers(pos[1])
+        if len(xy) >= 2 * system.num_nodes:
+            for idx in range(system.num_chiplets):
+                angle = angles[idx] if idx < len(angles) else 0.0
+                chiplets.append({
+                    "name": system.node_names[idx],
+                    "x": xy[idx],
+                    "y": xy[idx + system.num_nodes],
+                    "width": float(system.node_size_x[idx]),
+                    "height": float(system.node_size_y[idx]),
+                    "angle_rad": angle,
+                    "power_w": float(system.powermap[idx]) if idx < len(system.powermap) else 0.0,
+                })
+
+    return {
+        "case": case_name,
+        "mode": mode,
+        "unit": "um",
+        "interposer": {
+            "width": float(system.intp_width),
+            "height": float(system.intp_height),
+            "fence": [float(system.xlow), float(system.xhigh), float(system.ylow), float(system.yhigh)],
+        },
+        "thermal": {
+            "temp_aware_opt": bool(params.temp_aware_opt),
+            "thermal_solver": str(params.thermal_solver),
+            "thermal_dir": str(params.thermal_dir),
+            "num_grid_x": int(params.num_grid_x),
+            "num_grid_y": int(params.num_grid_y),
+        },
+        "chiplets": chiplets,
+        "raw_best_fp": raw,
+    }
+
+
 def normalize_stage(params: Params.Params, data: dict) -> None:
     default_stage = (Params.Params(SRC / "params.json").floorplan_stages or [{}])[0]
     stages = data.get("floorplan_stages") or params.floorplan_stages or [default_stage]
@@ -142,7 +214,7 @@ def load_params(param_file: Path, case_name: str, out_dir: Path) -> Params.Param
     params.fence_width = getattr(params, "fence_width", 0.0)
     params.fence_height = getattr(params, "fence_height", 0.0)
     params.result_dir = str(out_dir)
-    params.thermal_dir = str(ROOT / "thermal") + os.sep
+    params.thermal_dir = os.environ.get("ATPLACE_THERMAL_DIR", str(ROOT / "thermal")) + os.sep
     params.ILPsolver = getattr(params, "ILPsolver", "grb")
     params.thermal_solver = getattr(params, "thermal_solver", "hotspot")
     return params
@@ -279,6 +351,12 @@ def main() -> int:
         "runtime_s": time.time() - start,
         "has_best_fp": best_fp is not None,
     }
+    if best_fp is not None:
+        layout = export_layout(best_fp, system, params, args.case, args.mode)
+        layout_path = out_dir / "layout.json"
+        write_json(layout_path, layout)
+        summary["layout_json"] = str(layout_path)
+        summary["layout_chiplets"] = len(layout["chiplets"])
     write_json(out_dir / "summary.json", summary)
     print(json.dumps(summary, indent=2, ensure_ascii=False))
     return 0
