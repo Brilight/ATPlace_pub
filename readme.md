@@ -8,7 +8,7 @@ This repository contains a compact public package for ATPlace2.5D.
 - `src/`: encrypted ATPlace layout kernel and its runtime.
 - `thermal/`: HotSpot files used by thermal evaluation.
 - `utils/`: parsers for case input files.
-- `Thermal.py`: thermal helper entry file.
+- `Thermal.py`: optional readable HotSpot helper for users who want to inspect or reuse the floorplan/layer/power-trace generation logic.
 - `reproduce.sh`: shell entry for selecting a case and placement mode and starting the encrypted layout kernel.
 
 ## Usage
@@ -62,10 +62,13 @@ The case parameter files are self-contained layout settings. Do not change inter
 
 ## Thermal-Aware Mode
 
-Thermal-aware placement uses two thermal components.
+Thermal-aware placement is enabled by `temp_aware_opt` in `Thermal-aware.json`.
 
-1. `reproduce.py` creates a compact analytic thermal model object for the selected case and passes it into the encrypted placement kernel. The training and use of this compact model happen during the thermal-aware placement flow. No external pretrained thermal-model checkpoint is required in this public package.
-2. `thermal/` contains the HotSpot executable and the default HotSpot configuration. `Thermal.py` is the helper used to generate HotSpot floorplan, layer, power-trace, and configuration files from a chiplet layout. It is intentionally kept as readable Python so thermal stack parameters can be inspected or changed without exposing the encrypted placement implementation.
+`reproduce.py` builds the case, creates a compact analytic thermal-model object, and passes that object into the encrypted `ATPLACE.PlaceFlow.placeflow_core` kernel. The public wrapper does not run a separate visible thermal-model training script and does not write a thermal-model checkpoint before placement. It is therefore expected that a thermal run may print the same early placement messages as a wirelength run after a short initialization step.
+
+`Thermal.py` is not imported by `reproduce.py` in the current public wrapper. Prints added to `Thermal.py` will not appear during `bash reproduce.sh Case1 thermal` unless a user imports and calls that helper directly. The encrypted kernel may call its own internal thermal evaluation path. The readable `Thermal.py` file is kept as an optional reference implementation for generating HotSpot `.flp`, `.lcf`, `.ptrace`, and configuration files from a chiplet layout.
+
+`thermal/` contains the HotSpot executable and default HotSpot configuration used by public thermal evaluation resources. Runtime thermal directory selection is controlled by `ATPLACE_THERMAL_DIR`.
 
 The main thermal-aware layout controls are in `cases/<CaseX>/Thermal-aware.json`:
 
@@ -87,7 +90,24 @@ cp -R thermal thermal_custom
 ATPLACE_THERMAL_DIR="$PWD/thermal_custom" bash reproduce.sh Case1 thermal
 ```
 
-Use `Thermal.py` when the stack or generated HotSpot files must change. Examples include changing layer material constants, layer thicknesses, bump parameters, or how the HotSpot `.flp`, `.lcf`, and `.ptrace` files are generated. These edits affect thermal evaluation and the thermal-aware flow that depends on HotSpot output.
+Editing `Thermal.py` changes only that readable helper. It does not change `reproduce.py` or the encrypted placement kernel unless those files are modified to import and call the helper.
+
+Changing layer material constants, layer thicknesses, bump parameters, or generated `.flp`/`.lcf`/`.ptrace` content requires a wrapper or evaluation script that explicitly uses `Thermal.py`.
+
+## Running the Full Reproduction Matrix
+
+To run all ten cases in both modes, with three repeats per case-mode element and at most five cases active at the same time:
+
+```bash
+python reproduce_matrix.py --repeats 3 --case-workers 5
+```
+
+The script writes:
+
+- `repro_runs/<timestamp>/commands.json`: all commands launched;
+- `repro_runs/<timestamp>/<CaseX>/<mode>/rep*/stdout.log` and `stderr.log`;
+- `repro_runs/<timestamp>/summary.csv`: all completed repeats and metrics parsed from `summary.json`;
+- `repro_runs/<timestamp>/best.csv`: best repeat per case-mode element, ranked by the smallest `twl_m`.
 
 For a new case, create `cases/<NewCase>/` with matching Bookshelf-style files:
 

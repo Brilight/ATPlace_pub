@@ -336,6 +336,13 @@ def main() -> int:
     params = load_params(param_file, args.case, out_dir)
     system = build_system(case_dir, args.case, params)
     compact_model = build_compact_model(params, system)
+    if params.temp_aware_opt:
+        print(
+            "thermal_model=public_analytic_wrapper; thermal_helper_imported=false; "
+            "visible_training_step=false"
+        )
+    else:
+        print("thermal_model=disabled")
 
     start = time.time()
     result = placeflow_core(params, system, compact_model)
@@ -350,6 +357,9 @@ def main() -> int:
         "twl_m": float(hpwl) / 1e6,
         "runtime_s": time.time() - start,
         "has_best_fp": best_fp is not None,
+        "thermal_model": "public_analytic_wrapper" if compact_model is not None else "disabled",
+        "thermal_helper_imported": False,
+        "visible_training_step": False,
     }
     if best_fp is not None:
         layout = export_layout(best_fp, system, params, args.case, args.mode)
