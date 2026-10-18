@@ -1,6 +1,7 @@
 # ATPlace2.5D Public Package
 
 This repository contains a compact public package for ATPlace2.5D.
+!!!IMPORTANT: the up-to-time update can be found in https://github.com/PKU-IDEA/ATPlace_pub.
 
 ## Contents
 
